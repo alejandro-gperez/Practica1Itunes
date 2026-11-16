@@ -231,6 +231,7 @@ public class ItunesResponseService {
             resultadoConsulta.setArtistName(artistName);
             resultadoConsulta.setTrackName(trackName);
             resultadoConsulta.setLongDescription(longDescription);
+            
             if (releaseDate == null) {
                 resultadoConsulta.setReleaseDate(null);
             } else {
