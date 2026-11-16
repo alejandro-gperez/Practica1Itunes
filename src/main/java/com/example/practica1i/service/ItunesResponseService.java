@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import com.example.practica1i.dto.ItunesResponseDTO;
+import com.example.practica1i.entity.CabeceraConsulta;
+import com.example.practica1i.entity.ResultadoConsulta;
 import com.example.practica1i.repository.CabeceraConsultaRepository;
 import com.example.practica1i.repository.ResultadoConsultaRepository;
 
@@ -55,7 +57,19 @@ public class ItunesResponseService {
 
         List<ItunesResponseDTO> responseDTOs = new ArrayList<>();
 
+        CabeceraConsulta cabeceraConsulta = new CabeceraConsulta();
+
+        cabeceraConsulta.setFechaConsulta(OffsetDateTime.now());
+        cabeceraConsulta.setUrlConsultada(ITUNES_API_BASE_URL + "search?term=" + text);
+        cabeceraConsulta.setRespuestaAPI(respuesta);
+
+        cabeceraConsultaRepository.save(cabeceraConsulta);
+
         for (JsonNode r : results) {
+
+            ResultadoConsulta resultadoConsulta = new ResultadoConsulta();
+            resultadoConsulta.setCabeceraConsulta(cabeceraConsulta);
+
             String wrapperType = null;
             String artistName = null;
             String trackName = null;
@@ -86,6 +100,18 @@ public class ItunesResponseService {
             if (checkReleaseDate != null && !checkReleaseDate.isNull()) {
                 releaseDate = OffsetDateTime.parse(checkReleaseDate.asString());
             } 
+
+            resultadoConsulta.setWrapperType(wrapperType);
+            resultadoConsulta.setArtistName(artistName);
+            resultadoConsulta.setTrackName(trackName);
+            resultadoConsulta.setLongDescription(longDescription);
+            if (releaseDate == null) {
+                resultadoConsulta.setReleaseDate(null);
+            } else {
+                resultadoConsulta.setReleaseDate(releaseDate.toLocalDateTime());
+            }
+
+            resultadoConsultaRepository.save(resultadoConsulta);
 
             ItunesResponseDTO itunesResponseDTO = new ItunesResponseDTO();
             itunesResponseDTO.setWrapperType(wrapperType);
